@@ -10,22 +10,22 @@ public class Garden {
         Player[] players = new Player[100];
         for (int i = 0; i <100; i++) {
             if (i%5 == 0) {
-                players[i] = new Revolutionnaire(i, 0.8);
+                players[i] = new Revolutionnaire(i, 10);
                 //players[i] = new Naive(i);
             } else if (i%5 == 1) {
                 players[i] = new Saboteur(i, 15);
             } else if (i%5 == 2) {
-                players[i] = new Revolutionnaire(i, 0.8);
+                players[i] = new Revolutionnaire(i, 10);
                 //players[i] = new Naive(i);
             } else if (i%5 == 3){
-                players[i] = new Revolutionnaire(i, 0.8);
+                players[i] = new Revolutionnaire(i, 10);
                 //players[i] = new Naive(i);
             } else {
-                players[i] = new Revolutionnaire(i, 0.8);
+                players[i] = new Revolutionnaire(i, 10);
                 //players[i] = new Naive(i);
             }
         }
-        Game game = new Game(players, BOX_WIDTH, BOX_HEIGHT, MAX_GAIN, OPTI);
+        Game game = new Game(players, BOX_WIDTH, BOX_HEIGHT, MAX_GAIN, OPTI, true);
 
         GameScreen screen = new GameScreen(game);
         screen.display();

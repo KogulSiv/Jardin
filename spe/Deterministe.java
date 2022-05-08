@@ -8,6 +8,8 @@ public class Deterministe extends Player {
         this.plantRate = plantRate;
         this.sabotageRate = sabotageRate;
         this.currentState = 1;
+        setStrategyId(2);
+        //setStrategyId(0);
     }
 
 

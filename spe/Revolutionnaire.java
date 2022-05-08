@@ -1,18 +1,28 @@
 public class Revolutionnaire extends Player {
-    private double percent; //Compris entre 0 et 1
+    //private double percent; //Compris entre 0 et 1
+    private int k;
 
-    public Revolutionnaire(int id, double percent) {
-        super(id, "Revolutionnaire["+percent*100+"%]");
-        this.percent = percent;
+    public Revolutionnaire(int id, int k) {
+        super(id, "Revolutionnaire["+k+"]");
+        this.k = k;
+        setStrategyId(4);
+        //setStrategyId(0);
     }
 
     public boolean sabotage(Game game) {
         int nbAlivePlayers = game.getNumberOfPlayersAlive();
         Player currentPlayerToSabotage;
 
+        if (game.getAllianceStrat()) {
+            boolean cond = (game.getNumberOfStratInBoard() > 1) || (game.getNumberOfStratInBoard() == 1 && !game.isInBoardStrat(getStratId()));
+            if (!cond) {
+                return false;
+            }
+        }
+
         for (int i = 0; i < nbAlivePlayers; i++) {
             currentPlayerToSabotage = game.getPlayerSortedByGainAt(i);
-            if (currentPlayerToSabotage.getId() != this.getId() && currentPlayerToSabotage.getNumberOfUsedBoxes() != 0) {
+            if ((game.getAllianceStrat() && currentPlayerToSabotage.getStratId() != getStratId()) && currentPlayerToSabotage.getId() != this.getId() && currentPlayerToSabotage.getNumberOfUsedBoxes() != 0) {
                 int boxIndex = getRandomIndex(currentPlayerToSabotage.getNumberOfUsedBoxes());
                 game.sabotageBox(boxIndex, currentPlayerToSabotage, getId());
                 this.incNumberOfSabotages();
@@ -28,14 +38,13 @@ public class Revolutionnaire extends Player {
     public void makeMove(Game game) {
 
         boolean madeMove = false; 
-        int position = game.getPosition(this);
-        if (position < (1-percent)*game.getNumberOfPlayersAlive()) {
+        if (this.getNumberOfUsedBoxes() >= k) {
             madeMove = sabotage(game);
             if (!madeMove) {
-                randomlyPlantIntelligent(game);
+                randomlyPlant(game);
             }
         } else {
-                madeMove = randomlyPlantIntelligent(game);
+                madeMove = randomlyPlant(game);
             if (!madeMove)  {
                 sabotage(game);
             }

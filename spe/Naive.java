@@ -2,6 +2,7 @@ public class Naive extends Player {
     
     public Naive(int id) {
         super(id, "Naïve");
+        setStrategyId(0);
     }
 
     //Plante dans un emplacement libre au hasard

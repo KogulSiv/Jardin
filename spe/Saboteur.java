@@ -4,6 +4,8 @@ public class Saboteur extends Player {
     public Saboteur(int id, int nbPlantesMax) {
         super(id, "Saboteur["+nbPlantesMax+"]");
         this.nbPlantesMax = nbPlantesMax;
+        setStrategyId(1);
+        //setStrategyId(0);
     }
 
     //Plante dans un emplacement libre au hasard jusqu'à avoir nbPlantesMax

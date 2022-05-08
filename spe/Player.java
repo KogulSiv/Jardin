@@ -12,6 +12,7 @@ public abstract class Player {
     private String name;
     private int numberOfSabotages; //Nombre de sabotages
     private double totalGain; //Gain totale
+    private int strategyId;
 
     public Player(int id, String name) {
         this.id = id;
@@ -24,6 +25,14 @@ public abstract class Player {
 
     public Player() {
         this(0, "Jack");
+    }
+
+    public void setStrategyId(int id) {
+        strategyId = id;
+    }
+
+    public int getStratId() {
+        return strategyId;
     }
 
     public int getId() {
@@ -161,13 +170,24 @@ public boolean randomlyPlantIntelligent(Game game) {
 
 public boolean randomlySabotage(Game game) {
     int players = game.getNumberOfPlayersInBoard();
+
+    if (game.getAllianceStrat()) {
+        boolean cond = (game.getNumberOfStratInBoard() > 1) || (game.getNumberOfStratInBoard() == 1 && !game.isInBoardStrat(strategyId));
+        if (!cond) {
+            return false;
+        }
+    }
+    
+    Player playerToKill;
     if (players > 1 || (players == 1 && !this.inBoard())) {
         int playerIdInBoard = getRandomIndex(players);
-        while (game.getPlayerInBoard(playerIdInBoard) == getId()) {
+        playerToKill = game.getPlayer(game.getPlayerInBoard(playerIdInBoard));
+        while ((game.getAllianceStrat() && playerToKill.getStratId() == getStratId()) || game.getPlayerInBoard(playerIdInBoard) == getId()) {
             playerIdInBoard = getRandomIndex(players);
+            playerToKill = game.getPlayer(game.getPlayerInBoard(playerIdInBoard));
         }
 
-        Player playerToKill = game.getPlayer(game.getPlayerInBoard(playerIdInBoard));
+        //Player playerToKill = game.getPlayer(game.getPlayerInBoard(playerIdInBoard));
         int boxIndex = getRandomIndex(playerToKill.getNumberOfUsedBoxes());
         game.sabotageBox(boxIndex, playerToKill, this.id);
         this.numberOfSabotages += 1;

@@ -43,6 +43,8 @@ public class GamePanel extends JPanel implements Runnable {
 
     private int offsetRanking;
     private int offsetTick;
+    private int scrollBarHeight;
+    private int scrollBarY;
 
 
     public GamePanel(Game game) {
@@ -64,6 +66,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.clickedY = 0;
         this.offsetRanking = 0;
         this.offsetTick = 0;
+        this.scrollBarHeight = game.getNumberOfPlayersAlive()/20;
     }
 
     public void startGameThread() {
@@ -170,7 +173,7 @@ public class GamePanel extends JPanel implements Runnable {
         if (toGo && keyHandler.J) {
             if (kTicks == 0) {
                 toGo = game.nextTurn();
-                kTicks = 6;
+                kTicks = 3;
             } else {
                 kTicks--;
             }  
@@ -179,14 +182,16 @@ public class GamePanel extends JPanel implements Runnable {
         if (toGo && keyHandler.K) {
             if (kTicks == 0) {
                 toGo = game.nextTurn();
-                kTicks = 6;
+                kTicks = 3;
             } else {
                 kTicks--;
             }  
         }
 
         if (toGo && keyHandler.L) {
-            toGo = game.nextTurn();
+            while (toGo) {
+                toGo = game.nextTurn();
+            }
             keyHandler.LDone = true;
             keyHandler.L = false;
         }
@@ -305,13 +310,17 @@ public class GamePanel extends JPanel implements Runnable {
         c = new Color(120, 120, 120);
         g2d.setColor(c);
         g2d.fillRoundRect(x+width - 28, y + 18, 14, height - 32, 15, 15);
+        c = new Color(60, 60, 60);
+        g2d.setColor(c);
+        g2d.fillRoundRect(x+width - 28, y + 18, 14, (height-32)/scrollBarHeight, 15, 15); //NbPlayers/20
 
         c = new Color(255, 255, 255);
         g2d.setColor(c);
         g2d.setFont(font);
-        g2d.drawString("ID", x+28, y+40);
-        g2d.drawString("Stratégie", x+150, y+40);
-        g2d.drawString("Gains", x+480, y+40);
+        g2d.drawString("Rang", x+28, y+40);
+        g2d.drawString("ID", x+118, y+40);
+        g2d.drawString("Stratégie", x+240, y+40);
+        g2d.drawString("Gains", x+570, y+40);
 
 
         c = new Color(120, 120, 120);
@@ -330,9 +339,10 @@ public class GamePanel extends JPanel implements Runnable {
                 break;
             }
             currentPlayer = game.getPlayerSortedByGainAt(i + offsetRanking);
-            g2d.drawString(Integer.toString(currentPlayer.getId()), x+28, y + 38 + 40*(i+1));
-            g2d.drawString(currentPlayer.getName(), x+150, y + 38 + 40*(i+1));
-            g2d.drawString(Double.toString(currentPlayer.getTotalGain()), x+480, y + 38 + 40*(i+1));
+            g2d.drawString(Integer.toString((i + offsetRanking + 1)), x+28, y + 38 + 40*(i+1));
+            g2d.drawString(Integer.toString(currentPlayer.getId()), x+118, y + 38 + 40*(i+1));
+            g2d.drawString(currentPlayer.getName(), x+240, y + 38 + 40*(i+1));
+            g2d.drawString(String.format("%.3f", currentPlayer.getTotalGain()), x+570, y + 38 + 40*(i+1));
         }
         //g2d.fillRoundRect(x + 15, y + 40, width - 50, 30, 20, 20);
         //g2d.fillRoundRect(x + 15, y + 80, width - 50, 30, 20, 20);

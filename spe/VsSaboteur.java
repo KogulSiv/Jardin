@@ -26,16 +26,16 @@ public class VsSaboteur {
                         if (id%propSaboteur == 0) {
                             players[id] = new Saboteur(id, k);
                         } else {
-                            players[id] = new Justicier(id, PROP);
+                            players[id] = new Justicier(id, k);
                         }
                     }
 
-                    Game game = new Game(players, BOX_WIDTH, BOX_HEIGHT, MAX_GAIN, opti);
+                    Game game = new Game(players, BOX_WIDTH, BOX_HEIGHT, MAX_GAIN, opti, true);
                     game.playSilently();
                 }
 
                 // for (int i = 0; i < NB_GAME; i++) {
-                //     Game game = new Game(players, BOX_WIDTH, BOX_HEIGHT, MAX_GAIN, opti);
+                //     Game game = new Game(players, BOX_WIDTH, BOX_HEIGHT, MAX_GAIN, opti, true);
                 //     game.playSilently();
                 // }
             }

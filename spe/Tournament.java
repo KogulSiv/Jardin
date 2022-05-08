@@ -10,20 +10,28 @@ public class Tournament {
 
     public static void main(String[] args) {
 
+        System.out.println(NUMBER_STRATEGY);
+        System.out.println(REPRESENTATIVES*NUMBER_STRATEGY);
+        System.out.println(REPRESENTATIVES); //NAIVE
+        System.out.println(3*REPRESENTATIVES); //SABOTEUR
+        System.out.println(2*REPRESENTATIVES); //DETERMINISTE
+        System.out.println(2*REPRESENTATIVES); //JUSTICIER
+        System.out.println(2*REPRESENTATIVES); //REVOLUTIONNAIRE
+        
         Player[] players = new Player[REPRESENTATIVES*NUMBER_STRATEGY];
         for (int id = 0; id < REPRESENTATIVES*NUMBER_STRATEGY; id++) {
             if (id%NUMBER_STRATEGY == 0) {
                 players[id] = new Naive(id);
             } else if (id%NUMBER_STRATEGY == 1) {
-                players[id] = new Justicier(id, 0.8);
+                players[id] = new Justicier(id, (int)OPTI);
             } else if (id%NUMBER_STRATEGY == 2) {
-                players[id] = new Revolutionnaire(id, 0.8);
+                players[id] = new Revolutionnaire(id, (int)OPTI);
             } else if (id%NUMBER_STRATEGY == 3) {
                 players[id] = new Saboteur(id, (int)OPTI - 1);
             } else if (id%NUMBER_STRATEGY == 4) {
-                players[id] = new Justicier(id, 0.5);
+                players[id] = new Justicier(id, (int) OPTI+1);
             } else if (id%NUMBER_STRATEGY == 5) {
-                players[id] = new Revolutionnaire(id, 0.8);
+                players[id] = new Revolutionnaire(id, (int) OPTI+1);
             } else if (id%NUMBER_STRATEGY == 6) {
                 players[id] = new Deterministe(id, 1, 1);
             } else if (id%NUMBER_STRATEGY == 7) {
@@ -35,7 +43,7 @@ public class Tournament {
             }
         }
 
-        Game game = new Game(players, BOX_WIDTH, BOX_HEIGHT, MAX_GAIN, OPTI);
+        Game game = new Game(players, BOX_WIDTH, BOX_HEIGHT, MAX_GAIN, OPTI, false);
 
         GameScreen screen = new GameScreen(game);
         screen.display();

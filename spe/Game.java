@@ -11,6 +11,8 @@ public class Game {
     private List<Integer> freeBoxes; // Emplacements libres 
     private List<Integer> nextFreeBoxes; // Emplacements qui seront libres au prochain tour
     private List<Integer> inBoardPlayers; // Joueurs qui ont une plante dans le jeu
+    private List<Integer> inBoardStrategies; //Id des stratégies qui ont planté dans le jeu
+    private List<Integer> inBoardStrategiesCount; //Id des stratégies qui ont planté dans le jeu
     private List<Player> playersSortedBySabotage; //Joueurs triés pr ordre décroissante de nb de sabotage
     private List<Player> playersSortedByGain; //Joueurs triés pas ordre décroissante de gains
     private int box_height;
@@ -20,12 +22,16 @@ public class Game {
     private double maxGain;
     private double opti;
 
-    public Game(int number_of_players, int box_width, int box_height, double maxGain, double opti) {
+    private boolean allianceStrat; //S'il y a une pacte de non agression entre les joueurs de même stratégie
+
+    public Game(int number_of_players, int box_width, int box_height, double maxGain, double opti, boolean allianceStrat) {
         players = new Player[number_of_players];
         boxes = new Box[box_width][box_height];
         this.freeBoxes = new ArrayList<>();
         this.nextFreeBoxes = new ArrayList<>();
         this.inBoardPlayers = new ArrayList<>();
+        this.inBoardStrategies = new ArrayList<>();
+        this.inBoardStrategiesCount = new ArrayList<>();
         this.playersSortedBySabotage = new ArrayList<>();
         this.playersSortedByGain = new ArrayList<>();
         this.box_height = box_height;
@@ -33,6 +39,7 @@ public class Game {
         this.turns_before_elimination = ELIMINATION_TURNS;
         this.maxGain = maxGain;
         this.opti = opti;
+        this.allianceStrat = allianceStrat;
 
         for (int i = 0; i < number_of_players; i++) {
             players[i] = new Naive(i);
@@ -49,12 +56,14 @@ public class Game {
 
     }
 
-    public Game(Player[] players, int box_width, int box_height, double maxGain, double opti) {
+    public Game(Player[] players, int box_width, int box_height, double maxGain, double opti, boolean allianceStrat) {
         this.players = new Player[players.length];
         boxes = new Box[box_width][box_height];
         this.freeBoxes = new ArrayList<>();
         this.nextFreeBoxes = new ArrayList<>();
         this.inBoardPlayers = new ArrayList<>();
+        this.inBoardStrategies = new ArrayList<>();
+        this.inBoardStrategiesCount = new ArrayList<>();
         this.playersSortedBySabotage = new ArrayList<>();
         this.playersSortedByGain = new ArrayList<>();
         this.box_height = box_height;
@@ -62,6 +71,7 @@ public class Game {
         this.turns_before_elimination = ELIMINATION_TURNS;
         this.maxGain = maxGain;
         this.opti = opti;
+        this.allianceStrat = allianceStrat;
 
         for (int i = 0; i < players.length; i++) {
             this.players[i] = players[i];
@@ -105,7 +115,8 @@ public class Game {
             Player playerToEliminate = playersSortedByGain.get(playersSortedByGain.size() - 1);
             
             //System.out.println("Player " + playerToEliminate.getId() + " (" + playerToEliminate.getName() + ") is eliminated with a gain of " + playerToEliminate.getTotalGain());
-            System.out.println(playerToEliminate.getName() + ": " + playerToEliminate.getId());
+            //System.out.println(playerToEliminate.getName() + ": " + playerToEliminate.getId() + "(" + playerToEliminate.getTotalGain() + ")");
+            System.out.println(playerToEliminate.getStratId());
             nbAlivePlayers -= 1;
             playerToEliminate.kill(this);
             playersSortedBySabotage.remove(playerToEliminate);
@@ -195,6 +206,14 @@ public class Game {
         return inBoardPlayers.contains(playerId);  
     }
 
+    public boolean isInBoardStrat(int stratId) {
+        return inBoardStrategies.contains(stratId);
+    }
+
+    public int getNumberOfStratInBoard() {
+        return inBoardStrategies.size();
+    }
+
     public int getPlayerInBoard(int playerId) {
         return inBoardPlayers.get(playerId);
     }
@@ -209,6 +228,10 @@ public class Game {
 
     public int getNumberOfPlayersAlive() {
         return nbAlivePlayers;
+    }
+
+    public boolean getAllianceStrat() {
+        return allianceStrat;
     }
 
     public Player getPlayerSortedBySabotageAt(int index) {
@@ -234,7 +257,15 @@ public class Game {
     public void plantInBox(int boxPosition, Player player) {
         if (!player.inBoard()) {
             inBoardPlayers.add(player.getId());
+            if (!isInBoardStrat(player.getStratId())) {
+                inBoardStrategies.add(player.getStratId());
+                inBoardStrategiesCount.add(1);     
+            } else {
+                int idx = inBoardStrategies.lastIndexOf(player.getStratId());
+                inBoardStrategiesCount.set(idx, inBoardStrategiesCount.get(idx) + 1);
+            }
         }
+
         player.addBox(freeBoxes.get(boxPosition));
         int j = freeBoxes.get(boxPosition)%box_height;
         int i = (int) ((freeBoxes.get(boxPosition) - j)/box_height);        
@@ -253,7 +284,15 @@ public class Game {
         sabotedPlayer.removeUsedBox(boxIndex);
         if (!sabotedPlayer.inBoard()) {
             inBoardPlayers.remove(new Integer(sabotedPlayer.getId()));
+            //System.out.println(sabotedPlayer.getStratId());
+            int idx = inBoardStrategies.lastIndexOf(sabotedPlayer.getStratId());
+            inBoardStrategiesCount.set(idx, inBoardStrategiesCount.get(idx) -1);
+            if (inBoardStrategiesCount.get(idx) == 0) {
+                inBoardStrategiesCount.remove(idx);
+                inBoardStrategies.remove(idx);
+            }
         }
+
         nextFreeBoxes.add(boxPosition);
     }
 
